@@ -1,22 +1,18 @@
-const typeorm = require("typeorm");
+const mysql2 = require("mysql2/promise");
 
 require('dotenv').config()
 
 const getConnection = async () => {
-    return await typeorm.createConnection({
-        type: "mysql",
-        host: process.env.DB_HOST,
+    return mysql2.createPool({
+        connectionLimit: 5,
         port: process.env.DB_PORT,
-        username: process.env.DB_USER,
-        password: process.env.DB_PASS,
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
         database: process.env.DB_NAME,
-        synchronize: true,
-        entities: [
-            new typeorm.EntitySchema(require("./models/user")),
-        ]
+        password: process.env.DB_PASS
     });
 }
 
 module.exports = {
-    getConnection
+    getConnectionPool: getConnection
 };
