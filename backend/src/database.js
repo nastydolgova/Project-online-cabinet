@@ -1,6 +1,6 @@
 const mysql2 = require("mysql2/promise");
 
-require('dotenv').config()
+require('dotenv').config();
 
 const getConnection = async () => {
     return mysql2.createPool({
