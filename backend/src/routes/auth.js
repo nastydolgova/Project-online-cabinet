@@ -3,10 +3,11 @@ const router = express.Router();
 require('dotenv').config();
 
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 
-router.post("/auth/sign_up", urlencodedParser, async function (req, res) {
+router.post("/sign_up", urlencodedParser, async function (req, res) {
   const pool = await require("../database").getConnectionPool();
   if(!req.body) return res.sendStatus(400);
   const name = req.body.name;
@@ -32,7 +33,7 @@ router.post("/auth/sign_up", urlencodedParser, async function (req, res) {
   }
 });
 
-router.post("/auth/sign_in", urlencodedParser, async function (req, res) {
+router.post("/sign_in", urlencodedParser, async function (req, res) {
   const pool = await require("../database").getConnectionPool();
   if(!req.body) return res.sendStatus(400);
   const email = req.body.email;
@@ -46,7 +47,16 @@ router.post("/auth/sign_in", urlencodedParser, async function (req, res) {
     if (rows.length > 0){
       const user = rows[0];
       if (await bcrypt.compare(password, user.password)){
-        res.sendStatus(200);
+        const accessToken = jwt.sign({
+          id: user.id,
+          name: user.name,
+          email: user.email
+        }, process.env.JWT_SECRET);
+
+        res.status(200);
+        res.json({
+          accessToken
+        });
       }
       else {
         res.sendStatus(401);
