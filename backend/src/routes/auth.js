@@ -13,6 +13,7 @@ router.post("/sign_up", urlencodedParser, async function (req, res) {
   const name = req.body.name;
   const email = req.body.email;
   const password = req.body.password;
+  const number = req.body.phone_number;
 
   try {
     const [rows] = await pool.execute(
@@ -24,7 +25,7 @@ router.post("/sign_up", urlencodedParser, async function (req, res) {
       res.sendStatus(302);
     } else {
       const passwordHash = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS));
-      await pool.query("INSERT INTO users (name, email, password) VALUES (?,?,?)", [name, email, passwordHash]);
+      await pool.query("INSERT INTO users (name, email, password, phone_number) VALUES (?,?,?,?)", [name, email, passwordHash, number]);
       res.sendStatus(200);
     }
   } catch (e) {
