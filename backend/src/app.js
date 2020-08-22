@@ -5,6 +5,7 @@ const logger = require('morgan');
 
 const authRouter = require('./routes/auth');
 const addressesRouter = require('./routes/addresses');
+const counterTypeRouter = require('./routes/counter_types');
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/addresses', addressesRouter);
+app.use('/counter_types', counterTypeRouter)
 
 module.exports = app;
