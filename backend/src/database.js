@@ -5,6 +5,7 @@ require('dotenv').config();
 const getConnection = async () => {
     return mysql2.createPool({
         connectionLimit: 5,
+        timezone: 'Z',
         port: process.env.DB_PORT,
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
