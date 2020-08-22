@@ -24,6 +24,29 @@ router.get('/', authenticateJWT, async (req, res) => {
     }
 );
 
+router.get('/:id', authenticateJWT, async (req, res) => {
+        const id = req.params.id
+        const pool = await require("../database").getConnectionPool();
+        const user = req.user;
+        try {
+            const [rows] = await pool.execute(
+                'SELECT * FROM addresses WHERE user_id = ? AND id = ?',
+                [user.id, id]
+            );
+            if (rows.length > 0) {
+                res.status(200);
+                res.json(rows[0]);
+            } else {
+                res.sendStatus(404);
+            }
+
+        } catch (e){
+            console.error(e);
+            res.sendStatus(500);
+        }
+    }
+);
+
 router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
         const pool = await require("../database").getConnectionPool();
         const user = req.user;
@@ -41,6 +64,39 @@ router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
         }
     }
 );
+
+router.put('/:id', [authenticateJWT, urlencodedParser], async (req, res) => {
+    const id = req.params.id
+    const pool = await require("../database").getConnectionPool();
+    const address = req.body.address;
+    const apartments = req.body.apartments;
+    const fias = req.body.fias_code;
+    try {
+
+        await pool.query("UPDATE addresses SET address = ?, apartments = ?, fias_code = ? WHERE id = ?", [address, apartments, fias, id]);
+        res.sendStatus(200);
+
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+});
+
+router.delete('/:id', authenticateJWT, async (req, res) => {
+    const id = req.params.id
+    const user = req.user;
+    const pool = await require("../database").getConnectionPool();
+    try {
+
+        await pool.query("DELETE FROM addresses WHERE id = ? AND user_id = ?", [id, user.id]);
+        res.sendStatus(200);
+
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+});
+
 
 
 
