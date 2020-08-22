@@ -42,4 +42,6 @@ router.get('/:id', authenticateJWT, async (req, res) => {
         }
     }
 );
+
+
 module.exports = router;
