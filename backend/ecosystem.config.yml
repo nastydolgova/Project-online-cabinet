@@ -1,7 +1,5 @@
 apps:
-  - script   : ./build/App.js
-    name     : 'awesome-o-back'
+  - script   : ./bin/www
+    name     : 'backend'
     instances: 2
     exec_mode: cluster
-  - script : ./build/scripts/eventListener.js
-    name   : 'event-listener'

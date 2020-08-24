@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 router.get('/', authenticateJWT, async (req, res) => {
-        const pool = await require("../database").getConnectionPool();
+        const pool = await require("../database/database").getConnectionPool();
         const user = req.user;
         try {
             const [rows] = await pool.execute(
@@ -30,7 +30,7 @@ router.get('/', authenticateJWT, async (req, res) => {
 
 router.get('/:id', authenticateJWT, async (req, res) => {
         const id = req.params.id
-        const pool = await require("../database").getConnectionPool();
+        const pool = await require("../database/database").getConnectionPool();
         const user = req.user;
         try {
             const [rows] = await pool.execute(
@@ -55,7 +55,7 @@ router.get('/:id', authenticateJWT, async (req, res) => {
 );
 
 router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
-        const pool = await require("../database").getConnectionPool();
+        const pool = await require("../database/database").getConnectionPool();
         const counterId = req.body.counter_id;
         const registryTime = req.body.registry_time;
         const value = req.body.value;
@@ -84,7 +84,7 @@ router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
 );
 router.put('/:id', [authenticateJWT, urlencodedParser], async (req, res) => {
     const id = req.params.id
-    const pool = await require("../database").getConnectionPool();
+    const pool = await require("../database/database").getConnectionPool();
     const counterId = req.body.counter_id;
     const registryTime = req.body.registry_time;
     const value = req.body.value;
@@ -110,7 +110,7 @@ router.put('/:id', [authenticateJWT, urlencodedParser], async (req, res) => {
 router.delete('/:id', authenticateJWT, async (req, res) => {
     const id = req.params.id
     const user = req.user;
-    const pool = await require("../database").getConnectionPool();
+    const pool = await require("../database/database").getConnectionPool();
     try {
 
         await pool.query("DELETE FROM counter_values\n" +

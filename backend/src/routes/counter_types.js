@@ -4,7 +4,7 @@ const authenticateJWT = require("../middlewares/authenticateJWT");
 require('dotenv').config();
 
 router.get('/', authenticateJWT, async (req, res) => {
-        const pool = await require("../database").getConnectionPool();
+        const pool = await require("../database/database").getConnectionPool();
         try {
             const [rows] = await pool.execute(
                 'SELECT * FROM counter_types',
@@ -23,7 +23,7 @@ router.get('/', authenticateJWT, async (req, res) => {
 
 router.get('/:id', authenticateJWT, async (req, res) => {
         const id = req.params.id
-        const pool = await require("../database").getConnectionPool();
+        const pool = await require("../database/database").getConnectionPool();
         try {
             const [rows] = await pool.execute(
                 'SELECT * FROM counter_types WHERE id = ?',

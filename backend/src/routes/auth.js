@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
 router.post("/sign_up", urlencodedParser, async function (req, res) {
-  const pool = await require("../database").getConnectionPool();
+  const pool = await require("../database/database").getConnectionPool();
   if(!req.body) return res.sendStatus(400);
   const name = req.body.name;
   const email = req.body.email;
@@ -35,7 +35,7 @@ router.post("/sign_up", urlencodedParser, async function (req, res) {
 });
 
 router.post("/sign_in", urlencodedParser, async function (req, res) {
-  const pool = await require("../database").getConnectionPool();
+  const pool = await require("../database/database").getConnectionPool();
   if(!req.body) return res.sendStatus(400);
   const email = req.body.email;
   const password = req.body.password;
