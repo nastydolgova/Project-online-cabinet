@@ -1,0 +1,7 @@
+apps:
+  - script   : ./build/App.js
+    name     : 'awesome-o-back'
+    instances: 2
+    exec_mode: cluster
+  - script : ./build/scripts/eventListener.js
+    name   : 'event-listener'
