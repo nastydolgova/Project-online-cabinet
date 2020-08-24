@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
+const { counterPostValidation, counterPutValidation} = require("../middlewares/counter_validation");
 
 router.get('/', authenticateJWT, async (req, res) => {
         const pool = await require("../database/database").getConnectionPool();
@@ -48,7 +49,7 @@ router.get('/:id', authenticateJWT, async (req, res) => {
     }
 );
 
-router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
+router.post('/', [authenticateJWT, urlencodedParser, counterPostValidation], async (req, res) => {
         const pool = await require("../database/database").getConnectionPool();
         const name = req.body.name;
         const user = req.user;
@@ -66,7 +67,7 @@ router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
     }
 );
 
-router.put('/:id', [authenticateJWT, urlencodedParser], async (req, res) => {
+router.put('/:id', [authenticateJWT, urlencodedParser, counterPutValidation], async (req, res) => {
     const id = req.params.id
     const pool = await require("../database/database").getConnectionPool();
     const name = req.body.name;

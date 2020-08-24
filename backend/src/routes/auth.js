@@ -6,8 +6,10 @@ const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
+const { signInValidation, signUpValidation} = require("../middlewares/auth_validation");
 
-router.post("/sign_up", urlencodedParser, async function (req, res) {
+
+router.post("/sign_up", [urlencodedParser, signUpValidation], async function (req, res) {
   const pool = await require("../database/database").getConnectionPool();
   if(!req.body) return res.sendStatus(400);
   const name = req.body.name;
@@ -34,7 +36,7 @@ router.post("/sign_up", urlencodedParser, async function (req, res) {
   }
 });
 
-router.post("/sign_in", urlencodedParser, async function (req, res) {
+router.post("/sign_in", [ urlencodedParser, signInValidation,signInValidation ], async function (req, res) {
   const pool = await require("../database/database").getConnectionPool();
   if(!req.body) return res.sendStatus(400);
   const email = req.body.email;

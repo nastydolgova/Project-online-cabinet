@@ -4,6 +4,7 @@ const router = express.Router();
 
 const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
+const addressValidation = require("../middlewares/addresses_validation");
 
 router.get('/', authenticateJWT, async (req, res) => {
         const pool = await require("../database/database").getConnectionPool();
@@ -47,7 +48,7 @@ router.get('/:id', authenticateJWT, async (req, res) => {
     }
 );
 
-router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
+router.post('/', [authenticateJWT, urlencodedParser, addressValidation], async (req, res) => {
         const pool = await require("../database/database").getConnectionPool();
         const user = req.user;
         const address = req.body.address;
@@ -65,7 +66,7 @@ router.post('/', [authenticateJWT, urlencodedParser], async (req, res) => {
     }
 );
 
-router.put('/:id', [authenticateJWT, urlencodedParser], async (req, res) => {
+router.put('/:id', [authenticateJWT, urlencodedParser, addressValidation], async (req, res) => {
     const id = req.params.id
     const pool = await require("../database/database").getConnectionPool();
     const address = req.body.address;
