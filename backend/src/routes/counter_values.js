@@ -72,7 +72,16 @@ router.post('/', [authenticateJWT, urlencodedParser, counterValueValidation], as
                     "INSERT INTO counter_values (counter_id, registry_time, value) " +
                     "VALUES (?,?,?)",
                     [ counterId, registryTime, value]);
-                res.sendStatus(200);
+
+                const [rows] = await pool.query("SELECT LAST_INSERT_ID() AS newId");
+                const id = rows[0].newId;
+
+                const [counterValueRows] = await pool.execute(
+                    'SELECT * FROM counter_values WHERE id = ?',
+                    [id]
+                );
+
+                res.status(200).json(counterValueRows[0]);
             } else {
                 res.sendStatus(404);
             }
@@ -101,8 +110,13 @@ router.put('/:id', [authenticateJWT, urlencodedParser, counterValueValidation], 
             " WHERE id = ? AND counter_id IN (SELECT id FROM counters WHERE user_id = ?)",
             [counterId, registryTime, value, id, user.id]
         );
-        res.sendStatus(200);
 
+        const [rows] = await pool.execute(
+            'SELECT * FROM counter_values WHERE id = ?',
+            [id]
+        );
+
+        res.status(200).json(rows[0]);
     } catch (e) {
         console.error(e);
         res.sendStatus(500);

@@ -55,10 +55,20 @@ router.post('/', [authenticateJWT, urlencodedParser, addressValidation], async (
         const apartments = req.body.apartments;
         const fias = req.body.fias_code;
         try {
+            await pool.query(
+                "INSERT INTO addresses (user_id, address, apartments, fias_code) " +
+                    "VALUES (?,?,?,?)",
+                [user.id, address, apartments, fias]);
 
-            await pool.query("INSERT INTO addresses (user_id, address, apartments, fias_code) VALUES (?,?,?,?)", [user.id, address, apartments, fias]);
-            res.sendStatus(200);
+            const [rows] = await pool.query("SELECT LAST_INSERT_ID() AS newId");
+            const id = rows[0].newId;
 
+            const [addressesRows] = await pool.execute(
+                'SELECT * FROM addresses WHERE id = ?',
+                [id]
+            );
+
+            res.status(200).json(addressesRows[0]);
         } catch (e) {
             console.error(e);
             res.sendStatus(500);
@@ -74,9 +84,17 @@ router.put('/:id', [authenticateJWT, urlencodedParser, addressValidation], async
     const fias = req.body.fias_code;
     try {
 
-        await pool.query("UPDATE addresses SET address = ?, apartments = ?, fias_code = ? WHERE id = ?", [address, apartments, fias, id]);
-        res.sendStatus(200);
+        await pool.query(
+            "UPDATE addresses SET address = ?, apartments = ?, fias_code = ? WHERE id = ?",
+            [address, apartments, fias, id]
+        );
 
+        const [rows] = await pool.execute(
+            'SELECT * FROM addresses WHERE id = ?',
+            [id]
+        );
+
+        res.status(200).json(rows[0]);
     } catch (e) {
         console.error(e);
         res.sendStatus(500);

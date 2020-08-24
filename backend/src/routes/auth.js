@@ -56,10 +56,7 @@ router.post("/sign_in", [ urlencodedParser, signInValidation,signInValidation ],
           email: user.email
         }, process.env.JWT_SECRET);
 
-        res.status(200);
-        res.json({
-          accessToken
-        });
+        res.status(200).json({ accessToken });
       }
       else {
         res.sendStatus(401);
