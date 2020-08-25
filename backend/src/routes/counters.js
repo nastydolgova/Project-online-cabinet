@@ -6,19 +6,12 @@ require('dotenv').config();
 const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const { counterPostValidation, counterPutValidation} = require("../middlewares/counter_validation");
+const {getCounter, getCounterById, createCounter, updateCounter, deleteCounter} = require("../services/counterService");
 
 router.get('/', authenticateJWT, async (req, res) => {
-        const pool = await require("../database/database").getConnectionPool();
         const user = req.user;
         try {
-            const [rows] = await pool.execute(
-                'SELECT * FROM counters WHERE user_id = ?',
-                [user.id]
-            );
-
-            res.status(200);
-            res.json(rows);
-
+            res.status(200).json(await getCounter(user));
         } catch (e){
             console.error(e);
             res.sendStatus(500);
@@ -27,21 +20,15 @@ router.get('/', authenticateJWT, async (req, res) => {
 );
 
 router.get('/:id', authenticateJWT, async (req, res) => {
-        const id = req.params.id
-        const pool = await require("../database/database").getConnectionPool();
+        const id = req.params.id;
         const user = req.user;
         try {
-            const [rows] = await pool.execute(
-                'SELECT * FROM counters WHERE user_id = ? AND id = ?',
-                [user.id, id]
-            );
-            if (rows.length > 0) {
-                res.status(200);
-                res.json(rows[0]);
+            const counter = await getCounterById(user.id, id);
+            if (counter) {
+                res.status(200).json(counter);
             } else {
                 res.sendStatus(404);
             }
-
         } catch (e){
             console.error(e);
             res.sendStatus(500);
@@ -50,24 +37,14 @@ router.get('/:id', authenticateJWT, async (req, res) => {
 );
 
 router.post('/', [authenticateJWT, urlencodedParser, counterPostValidation], async (req, res) => {
-        const pool = await require("../database/database").getConnectionPool();
-        const name = req.body.name;
         const user = req.user;
+        const name = req.body.name;
         const addressId = req.body.address_id;
         const counterTypeId = req.body.counter_type_id;
         try {
+            const counter = await createCounter(name, user.id, addressId, counterTypeId);
 
-            await pool.query("INSERT INTO counters (name, user_id, address_id, counter_type_id) VALUES (?,?,?,?)", [name, user.id, addressId, counterTypeId]);
-
-            const [rows] = await pool.query("SELECT LAST_INSERT_ID() AS newId");
-            const id = rows[0].newId;
-
-            const [countersRows] = await pool.execute(
-                'SELECT * FROM counters WHERE id = ?',
-                [id]
-            );
-
-            res.status(200).json(countersRows[0]);
+            res.status(200).json(counter);
         } catch (e) {
             console.error(e);
             res.sendStatus(500);
@@ -76,20 +53,14 @@ router.post('/', [authenticateJWT, urlencodedParser, counterPostValidation], asy
 );
 
 router.put('/:id', [authenticateJWT, urlencodedParser, counterPutValidation], async (req, res) => {
-    const id = req.params.id
-    const pool = await require("../database/database").getConnectionPool();
-    const name = req.body.name;
+    const user = req.user;
     try {
-
-        await pool.query("UPDATE counters SET name = ? WHERE id = ?", [name, id]);
-
-        const [rows] = await pool.execute(
-            'SELECT * FROM counters WHERE id = ?',
-            [id]
-        );
-
-        res.status(200).json(rows[0]);
-
+        const counter = await updateCounter({
+            id: req.params.id,
+            userId: user.id,
+            name: req.body.name
+        });
+        res.status(200).json(counter);
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
@@ -99,12 +70,9 @@ router.put('/:id', [authenticateJWT, urlencodedParser, counterPutValidation], as
 router.delete('/:id', authenticateJWT, async (req, res) => {
     const id = req.params.id
     const user = req.user;
-    const pool = await require("../database/database").getConnectionPool();
     try {
-
-        await pool.query("DELETE FROM counters WHERE id = ? AND user_id = ?", [id, user.id]);
+        await deleteCounter(id, user.id);
         res.sendStatus(200);
-
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
