@@ -6,12 +6,12 @@ require('dotenv').config();
 const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const { counterPostValidation, counterPutValidation} = require("../middlewares/counter_validation");
-const {getCounter, getCounterById, createCounter, updateCounter, deleteCounter} = require("../services/counterService");
+const { getCounters, getCounterById, createCounter, updateCounter, deleteCounter} = require("../services/counterService");
 
 router.get('/', authenticateJWT, async (req, res) => {
         const user = req.user;
         try {
-            res.status(200).json(await getCounter(user));
+            res.status(200).json(await getCounters(user));
         } catch (e){
             console.error(e);
             res.sendStatus(500);

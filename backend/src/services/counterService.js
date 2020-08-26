@@ -1,5 +1,5 @@
 module.exports = {
-    getCounter: async(userId) => {
+    getCounters: async(userId) => {
         const pool = await require("../database/database").getConnectionPool();
         const [rows] = await pool.execute(
             'SELECT * FROM counters WHERE user_id = ?',
