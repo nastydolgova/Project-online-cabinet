@@ -10,7 +10,7 @@ const {getAddressById, getAddresses, createAddress, updateAddress, deleteAddress
 router.get('/', authenticateJWT, async (req, res) => {
         const user = req.user;
         try {
-            res.status(200).json(await getAddresses(user));
+            res.status(200).json(await getAddresses(user.id));
         } catch (e){
             console.error(e);
             res.sendStatus(500);
@@ -41,8 +41,8 @@ router.post('/', [authenticateJWT, urlencodedParser, addressValidation], async (
         const apartments = req.body.apartments;
         const fias = req.body.fias_code;
         try {
-            const address = await createAddress(user.id, address, apartments, fias);
-            res.status(200).json(address);
+            const createdAddress = await createAddress(user.id, address, apartments, fias);
+            res.status(200).json(createdAddress);
         } catch (e) {
             console.error(e);
             res.sendStatus(500);

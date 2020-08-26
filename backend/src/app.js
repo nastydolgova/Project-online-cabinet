@@ -22,9 +22,9 @@ app.use(cookieParser());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/auth', authRouter);
-app.use('api/v1/addresses', addressesRouter);
-app.use('api/v1/counter_types', counterTypeRouter)
-app.use('api/v1/counters', counterRouter)
-app.use('api/v1/counter_values', counterValuesRouter)
+app.use('/api/v1/counter_types', counterTypeRouter);
+app.use('/api/v1/addresses', addressesRouter);
+app.use('/api/v1/counters', counterRouter);
+app.use('/api/v1/counters/:counter_id/values', counterValuesRouter);
 
 module.exports = app;
