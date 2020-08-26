@@ -1,19 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const authenticateJWT = require("../middlewares/authenticateJWT");
+const {getCounterType, getCounterTypeById} = require("../services/counterTypeService");
 require('dotenv').config();
 
 router.get('/', authenticateJWT, async (req, res) => {
-        const pool = await require("../database/database").getConnectionPool();
         try {
-            const [rows] = await pool.execute(
-                'SELECT * FROM counter_types',
-                []
-            );
-
-            res.status(200);
-            res.json(rows);
-
+            res.status(200).json(await getCounterType());
         } catch (e){
             console.error(e);
             res.sendStatus(500);
@@ -23,19 +16,13 @@ router.get('/', authenticateJWT, async (req, res) => {
 
 router.get('/:id', authenticateJWT, async (req, res) => {
         const id = req.params.id
-        const pool = await require("../database/database").getConnectionPool();
         try {
-            const [rows] = await pool.execute(
-                'SELECT * FROM counter_types WHERE id = ?',
-                [id]
-            );
-            if (rows.length > 0) {
-                res.status(200);
-                res.json(rows[0]);
+            const counterType = await getCounterTypeById(id);
+            if (counterType) {
+                res.status(200).json(counterType);
             } else {
                 res.sendStatus(404);
             }
-
         } catch (e){
             console.error(e);
             res.sendStatus(500);
